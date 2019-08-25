@@ -1,10 +1,10 @@
+import operator
 from functools import reduce
 from itertools import chain
 from typing import Dict, Iterable, Mapping, Optional, Sequence
 
 from bankroll.analysis import deduplicatePositions
 from bankroll.brokers import *
-from bankroll.configuration import Configuration, Settings
 from bankroll.model import (
     AccountBalance,
     AccountData,
@@ -13,7 +13,7 @@ from bankroll.model import (
     Position,
 )
 
-import operator
+from .configuration import Configuration, Settings
 
 
 class AccountAggregator(AccountData):

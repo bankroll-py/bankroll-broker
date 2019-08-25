@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
-from bankroll.configuration import Settings
 from typing import Iterable, Mapping, Optional
 
-from .activity import Activity
-from .balance import AccountBalance
-from .marketdata import MarketDataProvider
-from .position import Position
+from bankroll.model import AccountBalance, Activity, MarketDataProvider, Position
+
+from .configuration import Settings
 
 
 # Offers data about one or more brokerage accounts, initialized with data

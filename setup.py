@@ -4,22 +4,18 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='bankroll',
-    version='0.3.3',
-    author='Justin Spahr-Summers',
-    author_email='justin@jspahrsummers.com',
-    description=
-    'Ingest portfolio and other data from multiple brokerages, and analyze it',
+    name="bankroll-broker",
+    version="0.4.0",
+    author="Justin Spahr-Summers",
+    author_email="justin@jspahrsummers.com",
+    description="TODO",
     long_description=long_description,
-    long_description_content_type='text/markdown',
-    license='MIT',
-    url='https://github.com/jspahrsummers/bankroll',
+    long_description_content_type="text/markdown",
+    license="MIT",
+    url="https://github.com/bankroll-py/bankroll-broker",
     packages=find_packages(),
-    package_data={'bankroll': ['bankroll.default.ini']},
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "Environment :: Console",
-        "Framework :: Jupyter",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
@@ -30,11 +26,8 @@ setup(
         "Typing :: Typed",
     ],
     install_requires=[
-        'ib-insync>=0.9.50',
-        'progress>=1.5',
-        'backoff>=1.8',
-        'pyfolio>=0.9.0',
+        "bankroll-model @ https://github.com/bankroll-py/bankroll-model@ef59ca108d002a13bd3a628281483ba83f23d8fa#egg=bankroll-model",
     ],
-    keywords=
-    'trading investing finance portfolio ib ibkr tws schwab fidelity vanguard',
-    entry_points={'console_scripts': ['bankroll = bankroll.__main__:main']})
+    keywords="trading investing finance portfolio",
+)
+

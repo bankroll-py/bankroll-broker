@@ -7,10 +7,12 @@ CriterionRowFilter = Callable[[List[str]], Optional[List[str]]]
 
 
 class CSVSectionCriterion(object):
-    def __init__(self,
-                 startSectionRowMatch: List[str],
-                 endSectionRowMatch: List[str],
-                 rowFilter: Optional[CriterionRowFilter] = None):
+    def __init__(
+        self,
+        startSectionRowMatch: List[str],
+        endSectionRowMatch: List[str],
+        rowFilter: Optional[CriterionRowFilter] = None,
+    ):
         self._startSectionRowMatch = startSectionRowMatch
         self._endSectionRowMatch = endSectionRowMatch
         self._rowFilter = rowFilter
@@ -29,16 +31,18 @@ class CSVSectionCriterion(object):
         return self._rowFilter
 
     def __hash__(self) -> int:
-        return hash((''.join(self._startSectionRowMatch),
-                     ''.join(self._endSectionRowMatch)))
+        return hash(
+            ("".join(self._startSectionRowMatch), "".join(self._endSectionRowMatch))
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, CSVSectionCriterion):
             return NotImplemented
         else:
-            return ((self._startSectionRowMatch,
-                     self._endSectionRowMatch) == (other._startSectionRowMatch,
-                                                   other._endSectionRowMatch))
+            return (self._startSectionRowMatch, self._endSectionRowMatch) == (
+                other._startSectionRowMatch,
+                other._endSectionRowMatch,
+            )
 
 
 class CSVSectionResult(NamedTuple):
@@ -46,9 +50,9 @@ class CSVSectionResult(NamedTuple):
     rows: List[List[str]]
 
 
-def parseSectionsForCSV(csvFile: Iterator[str],
-                        criteria: List[CSVSectionCriterion]
-                        ) -> List[CSVSectionResult]:
+def parseSectionsForCSV(
+    csvFile: Iterator[str], criteria: List[CSVSectionCriterion]
+) -> List[CSVSectionResult]:
     results: List[CSVSectionResult] = []
 
     assert len(criteria)
@@ -65,15 +69,19 @@ def parseSectionsForCSV(csvFile: Iterator[str],
         def rowEndsSection(row: List[str]) -> bool:
             if endSectionRowMatchLength == 0 and len(r) == 0:
                 return True
-            elif endSectionRowMatchLength > 0 and \
-                len(row) >= endSectionRowMatchLength and \
-                row[0:endSectionRowMatchLength] == criterion.endSectionRowMatch:
+            elif (
+                endSectionRowMatchLength > 0
+                and len(row) >= endSectionRowMatchLength
+                and row[0:endSectionRowMatchLength] == criterion.endSectionRowMatch
+            ):
                 return True
             else:
                 return False
 
-        if len(r) >= startSectionRowMatchLength and r[
-                0:startSectionRowMatchLength] == criterion.startSectionRowMatch:
+        if (
+            len(r) >= startSectionRowMatchLength
+            and r[0:startSectionRowMatchLength] == criterion.startSectionRowMatch
+        ):
             # starting section
             matchingRows = []
             continue

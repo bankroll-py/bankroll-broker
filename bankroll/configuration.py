@@ -14,27 +14,26 @@ import pkg_resources
 class Settings(Enum):
     @property
     def help(self) -> str:
-        return ''
+        return ""
 
     @classmethod
     def sectionName(cls) -> str:
         pass
 
 
-_S = TypeVar('_S', bound=Settings)
+_S = TypeVar("_S", bound=Settings)
 
 
 class Configuration:
-    defaultSearchPaths = [
-        os.path.expanduser('~/.bankroll.ini'), 'bankroll.ini'
-    ]
+    defaultSearchPaths = [os.path.expanduser("~/.bankroll.ini"), "bankroll.ini"]
 
-    _defaultConfigName = 'bankroll.default.ini'
+    _defaultConfigName = "bankroll.default.ini"
 
     @classmethod
     def _readDefaultConfig(cls) -> str:
-        return pkg_resources.resource_string('bankroll',
-                                             cls._defaultConfigName).decode()
+        return pkg_resources.resource_string(
+            "bankroll", cls._defaultConfigName
+        ).decode()
 
     def __init__(self, searchPaths: Iterable[str] = defaultSearchPaths):
         self._config = ConfigParser(empty_lines_in_values=False)
@@ -44,14 +43,14 @@ class Configuration:
         self._config.read(searchPaths)
         super().__init__()
 
-    def section(self,
-                settings: Type[_S],
-                overrides: Mapping[_S, Optional[str]] = {}) -> Dict[_S, str]:
+    def section(
+        self, settings: Type[_S], overrides: Mapping[_S, Optional[str]] = {}
+    ) -> Dict[_S, str]:
         elements: Iterable[_S] = list(settings)
 
         optionalValues = {
             key: overrides.get(key)
-            or self._config.get(settings.sectionName(), key.value, fallback='')
+            or self._config.get(settings.sectionName(), key.value, fallback="")
             for key in elements
         }
 
@@ -72,27 +71,28 @@ class Configuration:
 #
 # Returns a callable which will extract settings corresponding to this new argument group.
 def addSettingsToArgumentGroup(
-        settings: Type[_S],
-        group: Any) -> Callable[[Configuration, Namespace], Dict[_S, str]]:
+    settings: Type[_S], group: Any
+) -> Callable[[Configuration, Namespace], Dict[_S, str]]:
     section = settings.sectionName().lower()
 
     elements: Iterable[_S] = list(settings)
     argsBySetting: Dict[_S, str] = {
-        setting: section + '-' + setting.value.lower().replace(' ', '-')
+        setting: section + "-" + setting.value.lower().replace(" ", "-")
         for setting in elements
     }
 
     for setting, cliKey in argsBySetting.items():
-        group.add_argument(f'--{cliKey}', help=setting.help)
+        group.add_argument(f"--{cliKey}", help=setting.help)
 
     def readSettings(config: Configuration, ns: Namespace) -> Dict[_S, str]:
         argValues: Dict[str, str] = vars(ns)
 
-        return config.section(settings,
-                              overrides={
-                                  setting:
-                                  argValues.get(cliKey.replace('-', '_'))
-                                  for setting, cliKey in argsBySetting.items()
-                              })
+        return config.section(
+            settings,
+            overrides={
+                setting: argValues.get(cliKey.replace("-", "_"))
+                for setting, cliKey in argsBySetting.items()
+            },
+        )
 
     return readSettings

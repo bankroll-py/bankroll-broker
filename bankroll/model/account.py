@@ -21,8 +21,9 @@ class AccountData(ABC):
     # TODO: Hoist `lenient` into a Setting to make this less awkward.
     @classmethod
     @abstractmethod
-    def fromSettings(cls, settings: Mapping[Settings, str],
-                     lenient: bool) -> 'AccountData':
+    def fromSettings(
+        cls, settings: Mapping[Settings, str], lenient: bool
+    ) -> "AccountData":
         pass
 
     # Returns the positions currently held, fetching the data on-demand if

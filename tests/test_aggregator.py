@@ -18,14 +18,19 @@ class TestAccountAggregator(unittest.TestCase):
         self.accounts = [
             fidelity.FidelityAccount(
                 positions=Path(settings[fidelity.Settings.POSITIONS]),
-                transactions=Path(settings[fidelity.Settings.TRANSACTIONS])),
+                transactions=Path(settings[fidelity.Settings.TRANSACTIONS]),
+            ),
             schwab.SchwabAccount(
                 positions=Path(settings[schwab.Settings.POSITIONS]),
-                transactions=Path(settings[schwab.Settings.TRANSACTIONS])),
-            ibkr.IBAccount(trades=Path(settings[ibkr.Settings.TRADES]),
-                           activity=Path(settings[ibkr.Settings.ACTIVITY])),
+                transactions=Path(settings[schwab.Settings.TRANSACTIONS]),
+            ),
+            ibkr.IBAccount(
+                trades=Path(settings[ibkr.Settings.TRADES]),
+                activity=Path(settings[ibkr.Settings.ACTIVITY]),
+            ),
             vanguard.VanguardAccount(
-                statement=Path(settings[vanguard.Settings.STATEMENT]))
+                statement=Path(settings[vanguard.Settings.STATEMENT])
+            ),
         ]
 
     def testAccountAggregatorTestsAreComplete(self) -> None:
@@ -35,13 +40,13 @@ class TestAccountAggregator(unittest.TestCase):
 
             self.assertTrue(
                 any((type(a) == subclass for a in self.accounts)),
-                msg=
-                f'Expected to find {subclass} in TestAccountAggregator (to fix this error, instantiate an example {subclass} in the setUp method)'
+                msg=f"Expected to find {subclass} in TestAccountAggregator (to fix this error, instantiate an example {subclass} in the setUp method)",
             )
 
     def testDataAddsUp(self) -> None:
-        aggregator = AccountAggregator.fromSettings(helpers.fixtureSettings,
-                                                    lenient=False)
+        aggregator = AccountAggregator.fromSettings(
+            helpers.fixtureSettings, lenient=False
+        )
         instruments = set((p.instrument for p in aggregator.positions()))
 
         balance = AccountBalance(cash={})
@@ -52,16 +57,14 @@ class TestAccountAggregator(unittest.TestCase):
                 self.assertIn(
                     p.instrument,
                     instruments,
-                    msg=
-                    f'Expected {p} from {account} to show up in aggregated data'
+                    msg=f"Expected {p} from {account} to show up in aggregated data",
                 )
 
             for a in account.activity():
                 self.assertIn(
                     a,
                     aggregator.activity(),
-                    msg=
-                    f'Expected {a} from {account} to show up in aggregated data'
+                    msg=f"Expected {a} from {account} to show up in aggregated data",
                 )
 
         self.assertEqual(aggregator.balance(), balance)

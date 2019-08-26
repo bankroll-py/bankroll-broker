@@ -407,8 +407,8 @@ register_type_strategy(
     AccountData,
     builds(
         StubAccount,
-        positions=lists(from_type(Position)),
-        activity=lists(from_type(Activity)),
+        positions=lists(from_type(Position), max_size=5),
+        activity=lists(from_type(Activity), max_size=20),
         balance=from_type(AccountBalance),
     ),
 )

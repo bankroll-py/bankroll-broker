@@ -13,7 +13,7 @@ from tests import helpers
 
 
 class TestAccountAggregator(unittest.TestCase):
-    @given(lists(from_type(AccountData)))
+    @given(lists(from_type(AccountData), max_size=3))
     def testDataAddsUp(self, accounts: List[AccountData]) -> None:
         aggregator = AccountAggregator(accounts, lenient=False)
         instruments = set((p.instrument for p in aggregator.positions()))

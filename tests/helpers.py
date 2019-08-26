@@ -1,49 +1,48 @@
+import os
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from typing import Iterable, List, Mapping, Optional, TypeVar
+
+from bankroll.broker import AccountData
+from bankroll.broker.configuration import Settings
+from bankroll.model import (
+    AccountBalance,
+    Activity,
+    Bond,
+    Cash,
+    CashPayment,
+    Currency,
+    Forex,
+    Future,
+    FutureOption,
+    Instrument,
+    Option,
+    OptionType,
+    Position,
+    Quote,
+    Stock,
+    Trade,
+    TradeFlags,
+)
 from hypothesis import settings
 from hypothesis.strategies import (
+    SearchStrategy,
     builds,
     dates,
     datetimes,
     decimals,
     from_regex,
     from_type,
+    integers,
     just,
     lists,
-    integers,
     none,
     one_of,
     register_type_strategy,
     sampled_from,
     sets,
     text,
-    SearchStrategy,
 )
-from bankroll import (
-    AccountBalance,
-    AccountData,
-    Activity,
-    Cash,
-    Currency,
-    Instrument,
-    Stock,
-    Bond,
-    Option,
-    OptionType,
-    FutureOption,
-    Future,
-    Forex,
-    Position,
-    CashPayment,
-    Trade,
-    TradeFlags,
-    Quote,
-)
-from bankroll.brokers import *
-from bankroll.configuration import Settings
-from typing import List, Optional, TypeVar
-
-import os
 
 settings.register_profile("ci", max_examples=1000, deadline=100)
 settings.register_profile("dev", max_examples=10, deadline=100)
@@ -369,28 +368,50 @@ register_type_strategy(
 
 register_type_strategy(Quote, uniformCurrencyQuotes())
 
-register_type_strategy(
-    Settings, one_of([from_type(s) for s in Settings.__subclasses__()])
-)
+register_type_strategy(AccountBalance, accountBalances())
 
-fixtureSettings = {
-    fidelity.Settings.POSITIONS: "tests/fidelity_positions.csv",
-    fidelity.Settings.TRANSACTIONS: "tests/fidelity_transactions.csv",
-    ibkr.Settings.ACTIVITY: "tests/ibkr_activity.xml",
-    ibkr.Settings.TRADES: "tests/ibkr_trades.xml",
-    schwab.Settings.POSITIONS: "tests/schwab_positions.CSV",
-    schwab.Settings.TRANSACTIONS: "tests/schwab_transactions.CSV",
-    vanguard.Settings.STATEMENT: "tests/vanguard_positions_and_transactions.csv",
-}
+
+class StubAccount(AccountData):
+    _positions: List[Position]
+    _activity: List[Activity]
+    _balance: AccountBalance
+
+    @classmethod
+    def fromSettings(
+        cls, settings: Mapping[Settings, str], lenient: bool
+    ) -> "StubAccount":
+        raise NotImplementedError
+
+    def __init__(
+        self,
+        positions: List[Position],
+        activity: List[Activity],
+        balance: AccountBalance,
+    ):
+        self._positions = positions
+        self._activity = activity
+        self._balance = balance
+        super().__init__()
+
+    def positions(self) -> Iterable[Position]:
+        return self._positions
+
+    def activity(self) -> Iterable[Activity]:
+        return self._activity
+
+    def balance(self) -> AccountBalance:
+        return self._balance
+
 
 register_type_strategy(
     AccountData,
-    sampled_from(AccountData.__subclasses__()).map(
-        lambda cls: cls.fromSettings(fixtureSettings, lenient=False)
+    builds(
+        StubAccount,
+        positions=lists(from_type(Position)),
+        activity=lists(from_type(Activity)),
+        balance=from_type(AccountBalance),
     ),
 )
-
-register_type_strategy(AccountBalance, accountBalances())
 
 
 def cashUSD(amount: Decimal) -> Cash:

@@ -1,56 +1,25 @@
-from bankroll.aggregator import AccountAggregator
-from bankroll.brokers import *
-from bankroll.configuration import Settings
-from bankroll.model import AccountBalance, AccountData
+import unittest
 from pathlib import Path
 from typing import List
 
+from hypothesis import given
+from hypothesis.strategies import from_type, lists
+
+from bankroll.broker import AccountAggregator, AccountData
+from bankroll.broker.configuration import Settings
+from bankroll.model import AccountBalance, Activity, Position
+
 from tests import helpers
-import unittest
 
 
 class TestAccountAggregator(unittest.TestCase):
-    accounts: List[AccountData]
-
-    def setUp(self) -> None:
-        settings = helpers.fixtureSettings
-
-        self.accounts = [
-            fidelity.FidelityAccount(
-                positions=Path(settings[fidelity.Settings.POSITIONS]),
-                transactions=Path(settings[fidelity.Settings.TRANSACTIONS]),
-            ),
-            schwab.SchwabAccount(
-                positions=Path(settings[schwab.Settings.POSITIONS]),
-                transactions=Path(settings[schwab.Settings.TRANSACTIONS]),
-            ),
-            ibkr.IBAccount(
-                trades=Path(settings[ibkr.Settings.TRADES]),
-                activity=Path(settings[ibkr.Settings.ACTIVITY]),
-            ),
-            vanguard.VanguardAccount(
-                statement=Path(settings[vanguard.Settings.STATEMENT])
-            ),
-        ]
-
-    def testAccountAggregatorTestsAreComplete(self) -> None:
-        for subclass in AccountData.__subclasses__():
-            if subclass == AccountAggregator:
-                continue
-
-            self.assertTrue(
-                any((type(a) == subclass for a in self.accounts)),
-                msg=f"Expected to find {subclass} in TestAccountAggregator (to fix this error, instantiate an example {subclass} in the setUp method)",
-            )
-
-    def testDataAddsUp(self) -> None:
-        aggregator = AccountAggregator.fromSettings(
-            helpers.fixtureSettings, lenient=False
-        )
+    @given(lists(from_type(AccountData)))
+    def testDataAddsUp(self, accounts: List[AccountData]) -> None:
+        aggregator = AccountAggregator(accounts, lenient=False)
         instruments = set((p.instrument for p in aggregator.positions()))
 
         balance = AccountBalance(cash={})
-        for account in self.accounts:
+        for account in accounts:
             balance += account.balance()
 
             for p in account.positions():

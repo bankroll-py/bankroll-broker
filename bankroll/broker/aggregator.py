@@ -1,19 +1,13 @@
 import operator
 from functools import reduce
-from itertools import chain
+from itertools import chain, groupby
 from typing import Dict, Iterable, Mapping, Optional, Sequence
 
-from bankroll.analysis import deduplicatePositions
-from bankroll.brokers import *
-from bankroll.model import (
-    AccountBalance,
-    AccountData,
-    Activity,
-    MarketDataProvider,
-    Position,
-)
+from bankroll.model import AccountBalance, Activity, Position
 
+from .account import AccountData
 from .configuration import Configuration, Settings
+from .marketdata import MarketDataProvider
 
 
 class AccountAggregator(AccountData):
@@ -48,9 +42,20 @@ class AccountAggregator(AccountData):
         self._lenient = lenient
         super().__init__()
 
+    def _deduplicatePositions(
+        self, positions: Iterable[Position]
+    ) -> Iterable[Position]:
+        return (
+            reduce(operator.add, ps)
+            for i, ps in groupby(
+                sorted(positions, key=lambda p: p.instrument),
+                key=lambda p: p.instrument,
+            )
+        )
+
     def positions(self) -> Iterable[Position]:
         # TODO: Memoize the result of deduplication?
-        return deduplicatePositions(
+        return self._deduplicatePositions(
             chain.from_iterable((account.positions() for account in self._accounts))
         )
 

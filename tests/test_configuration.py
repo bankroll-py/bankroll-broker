@@ -22,6 +22,7 @@ class TestSettings(Settings):
     def sectionName(cls) -> str:
         return "Test"
 
+
 class TestConfiguration(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Configuration(["tests/bankroll.test.ini"])

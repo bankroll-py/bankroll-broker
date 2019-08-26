@@ -4,7 +4,6 @@ from typing import Iterable, Mapping, Optional
 from bankroll.model import AccountBalance, Activity, Position
 
 from .configuration import Settings
-from .marketdata import MarketDataProvider
 
 
 # Offers data about one or more brokerage accounts, initialized with data
@@ -46,8 +45,3 @@ class AccountData(ABC):
     @abstractmethod
     def balance(self) -> AccountBalance:
         pass
-
-    # Offers access to market data, if provided through this brokerage account.
-    @property
-    def marketDataProvider(self) -> Optional[MarketDataProvider]:
-        return None

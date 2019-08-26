@@ -7,7 +7,6 @@ from bankroll.model import AccountBalance, Activity, Position
 
 from .account import AccountData
 from .configuration import Configuration, Settings
-from .marketdata import MarketDataProvider
 
 
 class AccountAggregator(AccountData):
@@ -67,17 +66,4 @@ class AccountAggregator(AccountData):
             operator.add,
             (account.balance() for account in self._accounts),
             AccountBalance(cash={}),
-        )
-
-    @property
-    def marketDataProvider(self) -> Optional[MarketDataProvider]:
-        # Don't retrieve data providers twice to check for None, in case
-        # they're expensive to construct.
-        return next(
-            (
-                p
-                for p in (account.marketDataProvider for account in self._accounts)
-                if p
-            ),
-            None,
         )

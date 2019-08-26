@@ -67,3 +67,7 @@ class AccountAggregator(AccountData):
             (account.balance() for account in self._accounts),
             AccountBalance(cash={}),
         )
+
+    @property
+    def accounts(self) -> Sequence[AccountData]:
+        return self._accounts

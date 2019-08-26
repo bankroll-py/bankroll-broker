@@ -5,7 +5,6 @@ from io import StringIO
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Type, TypeVar
 
 import os
-import pkg_resources
 
 
 # Config sections should be implemented by subclassing this type,
@@ -27,19 +26,11 @@ _S = TypeVar("_S", bound=Settings)
 class Configuration:
     defaultSearchPaths = [os.path.expanduser("~/.bankroll.ini"), "bankroll.ini"]
 
-    _defaultConfigName = "bankroll.default.ini"
-
-    @classmethod
-    def _readDefaultConfig(cls) -> str:
-        return pkg_resources.resource_string(
-            "bankroll", cls._defaultConfigName
-        ).decode()
-
     def __init__(self, searchPaths: Iterable[str] = defaultSearchPaths):
         self._config = ConfigParser(empty_lines_in_values=False)
 
-        defaultConfig = self._readDefaultConfig()
-        self._config.read_string(defaultConfig, self._defaultConfigName)
+        # defaultConfig = self._readDefaultConfig()
+        # self._config.read_string(defaultConfig, self._defaultConfigName)
         self._config.read(searchPaths)
         super().__init__()
 

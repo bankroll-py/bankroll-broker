@@ -11,9 +11,7 @@ from .configuration import Configuration, Settings
 
 class AccountAggregator(AccountData):
     @classmethod
-    def allSettings(
-        cls, config: Configuration = Configuration()
-    ) -> Dict[Settings, str]:
+    def allSettings(cls, config: Configuration) -> Dict[Settings, str]:
         return dict(
             chain.from_iterable(
                 (

@@ -26,7 +26,7 @@ setup(
         "Typing :: Typed",
     ],
     install_requires=[
-        "bankroll-model @ https://github.com/bankroll-py/bankroll-model@d14670914229b558b42739176b031b03d93f261e#egg=bankroll-model"
+        "bankroll-model @ https://github.com/bankroll-py/bankroll-model@680edda2c89e0b66216502a65b0b01b540727745#egg=bankroll-model"
     ],
     keywords="trading investing finance portfolio",
 )

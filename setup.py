@@ -13,7 +13,8 @@ setup(
     long_description_content_type="text/markdown",
     license="MIT",
     url="https://github.com/bankroll-py/bankroll-broker",
-    packages=find_packages(),
+    packages=["bankroll.broker"],
+    package_data={"bankroll.broker": ["py.typed"]},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

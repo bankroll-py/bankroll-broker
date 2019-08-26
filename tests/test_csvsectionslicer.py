@@ -1,6 +1,6 @@
 from itertools import groupby
 from pathlib import Path
-from bankroll.csvsectionslicer import (
+from bankroll.broker.csvsectionslicer import (
     parseSectionsForCSV,
     CSVSectionCriterion,
     CSVSectionResult,

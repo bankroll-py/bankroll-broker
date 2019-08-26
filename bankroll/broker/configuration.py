@@ -26,11 +26,17 @@ _S = TypeVar("_S", bound=Settings)
 class Configuration:
     defaultSearchPaths = [os.path.expanduser("~/.bankroll.ini"), "bankroll.ini"]
 
-    def __init__(self, searchPaths: Iterable[str] = defaultSearchPaths):
+    def __init__(
+        self,
+        searchPaths: Iterable[str] = defaultSearchPaths,
+        defaultConfig: Optional[str] = None,
+        defaultConfigName: str = "bankroll.default.ini",
+    ):
         self._config = ConfigParser(empty_lines_in_values=False)
 
-        # defaultConfig = self._readDefaultConfig()
-        # self._config.read_string(defaultConfig, self._defaultConfigName)
+        if defaultConfig:
+            self._config.read_string(defaultConfig, defaultConfigName)
+
         self._config.read(searchPaths)
         super().__init__()
 

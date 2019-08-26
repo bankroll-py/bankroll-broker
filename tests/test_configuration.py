@@ -22,7 +22,6 @@ class TestSettings(Settings):
     def sectionName(cls) -> str:
         return "Test"
 
-
 class TestConfiguration(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Configuration(["tests/bankroll.test.ini"])
@@ -31,10 +30,6 @@ class TestConfiguration(unittest.TestCase):
         settings = self.config.section(TestSettings)
         self.assertEqual(settings[TestSettings.INT_KEY], "1234")
         self.assertEqual(settings[TestSettings.STR_KEY], "foobar")
-
-    def testNamespacedSettingsDoNotClobberEachOther(self) -> None:
-        # Tests that settings keys do not clobber each other.
-        self.assertEqual(len(helpers.fixtureSettings), 7)
 
     @given(sampled_from(TestSettings), text(min_size=1))
     def testOverrides(self, key: TestSettings, value: str) -> None:

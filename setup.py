@@ -8,7 +8,7 @@ setup(
     version="0.4.0",
     author="Justin Spahr-Summers",
     author_email="justin@jspahrsummers.com",
-    description="TODO",
+    description="Brokerage plugin interface",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
@@ -26,9 +26,7 @@ setup(
         "Topic :: Office/Business :: Financial :: Investment",
         "Typing :: Typed",
     ],
-    install_requires=[
-        "bankroll-model @ git+https://github.com/bankroll-py/bankroll-model@master#egg=bankroll-model"
-    ],
+    install_requires=["bankroll-model ~= 0.4.0"],
     keywords="trading investing finance portfolio",
 )
 

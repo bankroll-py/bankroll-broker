@@ -26,10 +26,13 @@ class AccountAggregator(AccountData):
         cls, settings: Mapping[Settings, str], lenient: bool
     ) -> "AccountAggregator":
         return AccountAggregator(
-            accounts=(
-                accountCls.fromSettings(settings, lenient=lenient)
-                for accountCls in AccountData.__subclasses__()
-                if not issubclass(accountCls, AccountAggregator)
+            accounts=filter(
+                None,
+                (
+                    accountCls.fromSettings(settings, lenient=lenient)
+                    for accountCls in AccountData.__subclasses__()
+                    if not issubclass(accountCls, AccountAggregator)
+                ),
             ),
             lenient=lenient,
         )

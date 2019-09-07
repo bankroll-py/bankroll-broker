@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="bankroll-broker",
-    version="0.4.0",
+    version="0.4.1",
     author="Justin Spahr-Summers",
     author_email="justin@jspahrsummers.com",
     description="Brokerage plugin interface",

@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from typing import List
+from typing import Iterable, List, Mapping
 
 from hypothesis import given
 from hypothesis.strategies import from_type, lists
@@ -8,8 +8,28 @@ from hypothesis.strategies import from_type, lists
 from bankroll.broker import AccountAggregator, AccountData
 from bankroll.broker.configuration import Settings
 from bankroll.model import AccountBalance, Activity, Position
-
 from tests import helpers
+
+
+class RecursiveAccountData(AccountData):
+    pass
+
+
+class StubRecursiveAccount(RecursiveAccountData):
+    @classmethod
+    def fromSettings(
+        cls, settings: Mapping[Settings, str], lenient: bool
+    ) -> "StubRecursiveAccount":
+        return cls()
+
+    def positions(self) -> Iterable[Position]:
+        return []
+
+    def activity(self) -> Iterable[Activity]:
+        return []
+
+    def balance(self) -> AccountBalance:
+        return AccountBalance(cash={})
 
 
 class TestAccountAggregator(unittest.TestCase):
@@ -37,3 +57,9 @@ class TestAccountAggregator(unittest.TestCase):
                 )
 
         self.assertEqual(aggregator.balance(), balance)
+
+    def testDiscoversRecursiveDescendants(self) -> None:
+        aggregator = AccountAggregator.fromSettings({}, lenient=False)
+        accountClasses = [type(acct) for acct in aggregator.accounts]
+        self.assertIn(StubRecursiveAccount, accountClasses)
+        self.assertNotIn(RecursiveAccountData, accountClasses)

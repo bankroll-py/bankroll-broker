@@ -1,7 +1,7 @@
 import operator
 from functools import reduce
 from itertools import chain, groupby
-from typing import Dict, Iterable, Mapping, Optional, Sequence
+from typing import Dict, Iterable, Mapping, Optional, Sequence, Type
 
 from bankroll.model import AccountBalance, Activity, Position
 
@@ -21,6 +21,25 @@ class AccountAggregator(AccountData):
             )
         )
 
+    @staticmethod
+    def _accountSubclasses(
+        start: Type[AccountData] = AccountData
+    ) -> Iterable[Type[AccountData]]:
+        return chain.from_iterable(
+            chain([cls], AccountAggregator._accountSubclasses(cls))
+            for cls in start.__subclasses__()
+            if not issubclass(cls, AccountAggregator)
+        )
+
+    @staticmethod
+    def _loadAccountFromSettings(
+        accountCls: Type[AccountData], settings: Mapping[Settings, str], lenient: bool
+    ) -> Optional[AccountData]:
+        try:
+            return accountCls.fromSettings(settings, lenient=lenient)
+        except NotImplementedError:
+            return None
+
     @classmethod
     def fromSettings(
         cls, settings: Mapping[Settings, str], lenient: bool
@@ -29,9 +48,10 @@ class AccountAggregator(AccountData):
             accounts=filter(
                 None,
                 (
-                    accountCls.fromSettings(settings, lenient=lenient)
-                    for accountCls in AccountData.__subclasses__()
-                    if not issubclass(accountCls, AccountAggregator)
+                    AccountAggregator._loadAccountFromSettings(
+                        accountCls, settings, lenient=lenient
+                    )
+                    for accountCls in AccountAggregator._accountSubclasses()
                 ),
             ),
             lenient=lenient,

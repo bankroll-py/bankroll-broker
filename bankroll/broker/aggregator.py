@@ -31,6 +31,15 @@ class AccountAggregator(AccountData):
             if not issubclass(cls, AccountAggregator)
         )
 
+    @staticmethod
+    def _loadAccountFromSettings(
+        accountCls: Type[AccountData], settings: Mapping[Settings, str], lenient: bool
+    ) -> Optional[AccountData]:
+        try:
+            return accountCls.fromSettings(settings, lenient=lenient)
+        except NotImplementedError:
+            return None
+
     @classmethod
     def fromSettings(
         cls, settings: Mapping[Settings, str], lenient: bool
@@ -39,7 +48,9 @@ class AccountAggregator(AccountData):
             accounts=filter(
                 None,
                 (
-                    accountCls.fromSettings(settings, lenient=lenient)
+                    AccountAggregator._loadAccountFromSettings(
+                        accountCls, settings, lenient=lenient
+                    )
                     for accountCls in AccountAggregator._accountSubclasses()
                 ),
             ),
